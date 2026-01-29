@@ -1,0 +1,451 @@
+/* =========================================
+   1. GLOBAL VARIABLES & RESET
+   ========================================= */
+:root {
+    --primary-bg-1: #1B2F33; /* Deep Purple (Sidebar) */
+    --primary-bg-2: #28502E;
+    --accent-1: rgba(255,255,255,0.7);
+    --accent-2: #ffdeb9;
+    --text-color: #ffffff;
+    --card-bg: rgba(255, 255, 255, 0.1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+body {
+    background-color: var(--primary-bg-1);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex; /* Sidebar + Main Layout */
+    overflow-x: hidden;
+}
+
+section, #home, #about, #projects, #certs, #contacts{
+    /* DO NOT include "transition: opacity" here */
+    opacity: 1; /* Default state */
+    will-change: opacity; /* Tells browser to expect changes (improves performance) */
+}
+
+/* =========================================
+   2. BACKGROUND ANIMATION (BLOBS)
+   ========================================= */
+.background-container {
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    overflow: hidden; 
+    z-index: -1;
+}
+
+.blob {
+    position: absolute; 
+    border-radius: 50%; 
+    filter: blur(80px); 
+    opacity: 0.7;
+    transition: transform ease-in-out; 
+}
+
+.blob-1 { width: 50vw; height: 50vw; background: #4d696e; }
+.blob-2 { width: 60vw; height: 60vw; background: #4f4f65; }
+.blob-3 { width: 40vw; height: 40vw; background: #467127; opacity: 0.5; }
+.blob-4 { width: 35vw; height: 35vw; background: #2e5434; }
+
+/* =========================================
+   3. SIDEBAR & NAVIGATION
+   ========================================= */
+.sidebar {
+    width: 280px;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3); 
+    backdrop-filter: blur(10px);
+    position: fixed;
+    top: 0; left: 0;
+    display: flex; flex-direction: column;
+    padding: 2rem;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    z-index: 100;
+}
+
+.profile-section { text-align: center; margin-bottom: 3rem; }
+
+/* Add this to your stylesheet */
+.sidebar-pic img {
+    /* 1. Set fixed square dimensions to make it smaller */
+    /* Change "120px" in BOTH places to adjust the overall size */
+    width: 120px;
+    height: 120px;
+
+    /* 2. This makes the square image into a perfect circle */
+    border-radius: 50%;
+
+    /* 3. Critical: Ensures rectangular images don't get squished */
+    /* It crops the excess parts instead of stretching the image */
+    object-fit: cover;
+    object-position: center; /* Ensures the center of the photo is focused */
+
+    /* Optional: Add a nice border to pop it out from the background */
+    border: 3px solid white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Optional shadow depth */
+
+    /* Optional: Centers the image horizontally if the sidebar is wider */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.profile-name { 
+    color: var(--accent-1); 
+    font-size: 1.5rem; 
+    margin-top: 20px;
+    display: block;
+}
+
+/* Navigation Links */
+nav { 
+    flex: 1; 
+    position: relative; 
+}
+
+.nav-container {
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; 
+    position: relative;
+}
+
+.nav-item {
+    text-decoration: none;
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+    font-size: 1.1rem;
+    padding: 12px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: flex; 
+    align-items: center; 
+    gap: 15px;
+    z-index: 2;
+}
+
+.nav-item:hover, .nav-item.active {
+    color: #fff;
+    background: rgba(255,255,255,0.1);
+}
+
+.nav-item i { 
+    width: 20px; 
+    text-align: center; 
+}
+
+/* Active Marker (Green Line) */
+#marker {
+    position: absolute;
+    left: 0; top: 0;
+    width: 4px; height: 0; 
+    background-color: var(--accent-1);
+    border-radius: 0 4px 4px 0;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 3;
+}
+
+/* Sidebar Footer */
+.sidebar-footer { 
+    text-align: center; 
+}
+
+.resume-btn {
+    background: var(--accent-1); 
+    color: #333;
+    border: none; padding: 10px 24px; 
+    border-radius: 30px;
+    font-weight: bold; cursor: pointer; 
+    width: 100%;
+    transition: transform 0.2s;
+}
+
+.resume-btn:hover { transform: scale(1.05); }
+
+/* =========================================
+   4. MAIN CONTENT LAYOUT (SHARED)
+   ========================================= */
+main {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-behavior: smooth; 
+    scrollbar-width: none;
+}
+
+main::-webkit-scrollbar { 
+    display: none; 
+}
+
+.page-content {
+    min-height: 100vh; 
+    width: 100%;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: 0 4rem;
+    position: relative; 
+    opacity: 0;
+    transform: translateY(40px); 
+    transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+.page-content.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.card {
+    background: var(--card-bg); 
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 16px; 
+    padding: 3rem; 
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* =========================================
+   5. PAGE: HOME & TECH STACK
+   ========================================= */
+.center-content { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    text-align: center; 
+    gap: 2rem; 
+}
+
+.highlight { 
+    color: #D9CAB3; 
+}
+
+/* Tech Stack Container */
+.tech-stack-container {
+    margin-top: 2.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1.5rem;
+}
+
+.stack-label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 1rem;
+}
+
+.icons-wrapper {
+    display: flex; 
+    justify-content: center;
+    gap: 1.5rem; 
+    flex-wrap: wrap;
+}
+
+.icon-box {
+    position: relative;
+    font-size: 2.5rem; 
+    color: rgba(255, 255, 255, 0.6); 
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.icon-box:hover {
+    transform: translateY(-5px); 
+    color: #fff; 
+}
+
+/* Tooltips */
+.tooltip {
+    position: absolute;
+    bottom: -30px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    background: rgba(0,0,0,0.8);
+    padding: 4px 8px;
+    border-radius: 4px;
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+    font-family: sans-serif;
+}
+
+.icon-box:hover .tooltip { 
+    opacity: 1; 
+    visibility: visible; 
+}
+
+/* Icon Specific Colors */
+.icon-box:hover .devicon-c-plain { color: #A8B9CC; }
+.icon-box:hover .devicon-python-plain { color: #3776AB; }
+.icon-box:hover .devicon-html5-plain { color: #E34F26; }
+.icon-box:hover .devicon-css3-plain { color: #1572B6; }
+.icon-box:hover .devicon-javascript-plain { color: #F7DF1E; }
+.icon-box:hover .devicon-php-plain { color: #777BB4; }
+.icon-box:hover .devicon-figma-plain { color: #F24E1E; }
+
+.icon-box:hover .devicon-bootstrap-plain { color: #7952B3; }
+.icon-box:hover .devicon-mysql-plain { color: #4479A1; }
+
+/* =========================================
+   6. PAGE: ABOUT & EDUCATION
+   ========================================= */
+.education-timeline {
+    border-left: 2px solid rgba(255,255,255,0.2);
+    padding-left: 2rem;
+    margin-top: 1rem;
+}
+
+.edu-card { 
+    position: relative; 
+    margin-bottom: 2rem; }
+
+.edu-card::before {
+    content: ''; 
+    position: absolute; 
+    left: -2.4rem; 
+    top: 5px;
+    width: 12px; 
+    height: 12px; 
+    background: var(--accent-1);
+    border-radius: 50%; 
+    box-shadow: 0 0 10px var(--accent-1);
+}
+
+.edu-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: baseline; 
+    flex-wrap: wrap;
+}
+
+.edu-header h4 { 
+    font-size: 1.2rem; 
+    color: #fff; 
+    margin-bottom: 0.5rem; 
+}
+
+.edu-year { 
+    color: var(--accent-2); 
+    font-weight: bold; 
+    font-size: 0.9rem; 
+}
+
+.edu-school { 
+    color: var(--accent-1); 
+    font-size: 1rem; 
+    margin-bottom: 0.5rem; 
+}
+
+.edu-desc { color: rgba(255,255,255,0.7); 
+    font-size: 0.95rem; 
+}
+/* =========================================
+   7. PAGE: PROJECTS (WIP)
+   ========================================= */
+.gear-icon { 
+    width: 100px; 
+    fill: var(--accent-1); /* Use 'fill' to color the shape */
+    animation: spin 4s linear infinite; 
+}
+
+/* =========================================
+   8. PAGE: CERTIFICATES
+   ========================================= */
+.cert-list {
+    display: flex; 
+    flex-direction: column;
+    gap: 1.5rem; 
+    margin-top: 1.5rem;
+}
+
+.cert-item {
+    display: flex; 
+    align-items: center;
+    gap: 1.5rem;
+    background: rgba(255,255,255,0.2);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: transform 0.2s ease;
+}
+
+.cert-item:hover {
+    transform: translateX(10px); 
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.cert-badge {
+    width: 80px; 
+    height: 80px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10%;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--accent-1); 
+    flex-shrink: 0; 
+}
+
+.cert-details h3 { 
+    font-size: 1.1rem; 
+    margin-bottom: 0.2rem; 
+    color: #fff; 
+}
+.cert-details p { 
+    font-size: 0.9rem; 
+    color: rgba(255, 255, 255, 0.6); 
+    margin-bottom: 0.8rem; 
+}
+
+.small-btn {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    background: transparent;
+    border: 1px solid var(--accent-1);
+    color: var(--accent-1);
+}
+
+.small-btn:hover {
+    background: var(--accent-1);
+    color: #333;
+}
+
+/* =========================================
+   9. PAGE: CONTACT
+   ========================================= */
+.contact-buttons { 
+    display: flex; 
+    gap: 1rem; 
+    margin-top: 1rem; 
+    justify-content: center; 
+}
+
+.action-btn.secondary { 
+    padding: 10px 20px; 
+    border-radius: 20px; 
+    border: none; 
+    background: var(--accent-1); 
+    font-weight: bold; 
+    cursor: pointer; 
+    transition: transform 0.2s;
+    text-decoration: none;
+    color: #333;
+}
+
+.action-btn:hover { transform: scale(1.1); }
+
+/* =========================================
+   10. KEYFRAMES / ANIMATIONS
+   ========================================= */
+@keyframes slideUp { 
+    from { opacity: 0; transform: translateY(20px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+@keyframes spin { 
+    100% { transform: rotate(360deg); } 
+}
