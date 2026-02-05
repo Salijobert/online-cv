@@ -37,7 +37,7 @@ mainContainer.addEventListener('scroll', () => {
         const rect = section.getBoundingClientRect();
         const sectionHeight = section.offsetHeight;
 
-        const fadeDistance = sectionHeight / 1.5; 
+        const fadeDistance = sectionHeight / 1; 
 
         if (rect.top < 0) {
             let newOpacity = 1 + (rect.top / fadeDistance);
