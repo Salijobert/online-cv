@@ -30,34 +30,34 @@ navLinks.forEach(link => {
     });
 });
 
-mainContainer.addEventListener('scroll', () => {
-    const viewHeight = mainContainer.clientHeight;
+// mainContainer.addEventListener('scroll', () => {
+//     const viewHeight = mainContainer.clientHeight;
 
-    pageSections.forEach(section => {
-        const rect = section.getBoundingClientRect();
-        const sectionHeight = section.offsetHeight;
+//     pageSections.forEach(section => {
+//         const rect = section.getBoundingClientRect();
+//         const sectionHeight = section.offsetHeight;
 
-        const fadeDistance = sectionHeight / 1; 
+//         const fadeDistance = sectionHeight / 1; 
 
-        if (rect.top < 0) {
-            let newOpacity = 1 + (rect.top / fadeDistance);
+//         if (rect.top < 0) {
+//             let newOpacity = 1 + (rect.top / fadeDistance);
             
-            if (newOpacity < 0) newOpacity = 0;
-            section.style.opacity = newOpacity;
-        } 
-        else if (rect.bottom > viewHeight) {
-            const hiddenAmount = rect.bottom - viewHeight;
+//             if (newOpacity < 0) newOpacity = 0;
+//             section.style.opacity = newOpacity;
+//         } 
+//         else if (rect.bottom > viewHeight) {
+//             const hiddenAmount = rect.bottom - viewHeight;
             
-            let newOpacity = 1 - (hiddenAmount / fadeDistance);
+//             let newOpacity = 1 - (hiddenAmount / fadeDistance);
 
-            if (newOpacity < 0) newOpacity = 0;
-            section.style.opacity = newOpacity;
-        }
-        else {
-            section.style.opacity = 1;
-        }
-    });
-});
+//             if (newOpacity < 0) newOpacity = 0;
+//             section.style.opacity = newOpacity;
+//         }
+//         else {
+//             section.style.opacity = 1;
+//         }
+//     });
+// });
 
 
 function indicator(element) {
